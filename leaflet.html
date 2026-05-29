@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event Map — Pebble Beach Concours</title>
+  <meta name="description" content="Interactive event map of attractions, auctions, dining, sponsors and services at the Pebble Beach Concours." />
+</head>
+<body>
+  <div id="map" role="application" aria-label="Interactive event map"></div>
+
+  <div class="hint" id="hint">Drag to pan · Scroll to zoom · Click pins to explore</div>
+
+  <!-- SEO + a11y: full list of attractions, visually hidden but in the DOM.
+       Clicking a link zooms the Leaflet map to that pin. Injected at build time
+       by the attractions-list Vite plugin (see vite.config.js). -->
+  <nav class="sr-list" aria-label="All attractions">
+    <h1>All Attractions</h1>
+    <!--ATTRACTIONS_LIST-->
+  </nav>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

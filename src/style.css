@@ -1,0 +1,78 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; color: #222; }
+body { display: flex; flex-direction: column; }
+
+#map {
+  flex: 1;
+  background: #ffffff;
+}
+
+/* Hide the leaflet image overlay's default border weirdness */
+.leaflet-container { background: #fff; outline: none; }
+
+/* PIN */
+.pin-icon-wrapper { background: transparent !important; border: none !important; }
+.pin-circle {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #867050; border: 3px solid #fff; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+  transition: transform 0.15s, background 0.15s, color 0.15s;
+}
+.pin-icon-wrapper:hover .pin-circle {
+  background: #fff; color: #867050; transform: scale(1.2);
+}
+
+/* CLUSTER */
+.cluster-icon-wrapper { background: transparent !important; border: none !important; }
+.cluster-circle {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: #867050; border: 3px solid #fff; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.55);
+  transition: transform 0.15s, background 0.15s;
+}
+.cluster-icon-wrapper:hover .cluster-circle {
+  background: #5a4a35; transform: scale(1.12);
+}
+
+/* POPUP */
+.leaflet-popup-content-wrapper {
+  border: 2.5px solid #867050; border-radius: 14px; padding: 0;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+}
+.leaflet-popup-content { margin: 10px; }
+.leaflet-popup-tip { background: #fff; border: 2.5px solid #867050; }
+
+.pop { display: flex; gap: 14px; align-items: center; }
+.pop-thumb { width: 90px; height: 72px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+.pop-cat { font-size: 0.7rem; color: #867050; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+.pop-title { font-size: 1rem; font-weight: 700; color: #222; line-height: 1.35; margin-top: 2px; }
+
+/* Hint */
+.hint {
+  position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.55); color: #ccc;
+  padding: 6px 14px; border-radius: 20px; font-size: 0.75rem;
+  pointer-events: none; z-index: 1000; transition: opacity 1s;
+}
+.hint.hidden { opacity: 0; }
+
+/* SEO-crawlable attraction list — visually hidden but in the DOM for crawlers
+   and screen readers. Use position absolute with 1px clip rather than display:none
+   so search engines still see it. */
+.sr-list {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* Leaflet zoom button restyle to match the original look */
+.leaflet-bar a, .leaflet-bar a:hover {
+  background: #fff; color: #867050; border: 2px solid #867050;
+  width: 40px; height: 40px; line-height: 36px; font-weight: 700; font-size: 1.3rem;
+  border-radius: 8px !important; margin-bottom: 6px;
+}
+.leaflet-bar a:hover { background: #867050; color: #fff; }
+.leaflet-bar { border: none !important; box-shadow: none !important; background: transparent; }
