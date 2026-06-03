@@ -38,8 +38,12 @@ map.setMaxBounds([
   [MAP_H + 100, MAP_W + 100],
 ]);
 
-// Init zoom so the map image fills the full viewport height (100svh)
-const initZoom = Math.log2(map.getContainer().clientHeight / MAP_H);
+// ≥1280px: fit map image width to viewport width; otherwise fit height to 100svh
+const _cw = map.getContainer().clientWidth;
+const _ch = map.getContainer().clientHeight;
+const initZoom = _cw >= 1280
+  ? Math.log2(_cw / MAP_W)
+  : Math.log2(_ch / MAP_H);
 map.setView([MAP_H / 2, MAP_W / 2], initZoom);
 
 L.control.zoom({ position: "bottomright" }).addTo(map);
