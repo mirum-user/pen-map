@@ -18,14 +18,14 @@ import "./style.css";
 // In CRS.Simple, latLng = [y, x] in image pixels.
 const map = L.map("map", {
   crs: L.CRS.Simple,
-  minZoom: -2,
+  minZoom: 0.1,
   maxZoom: 2,
-  zoomSnap: 0.25,
+  zoomSnap: 0.4,
   zoomDelta: 0.5,
   zoomControl: false,
   attributionControl: false,
   inertia: true,
-  wheelPxPerZoomLevel: 120,
+  wheelPxPerZoomLevel: 60,
 });
 
 const bounds = [
