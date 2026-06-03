@@ -1,78 +1,396 @@
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; color: #222; }
-body { display: flex; flex-direction: column; }
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", sans-serif;
+  color: #222;
+
+  --color-primary: #c6bfb2;
+}
 
 #map {
-  flex: 1;
+  width: 100%;
+  height: 100svh;
   background: #ffffff;
+  /* offset for safe area */
+  margin-top: -24px;
 }
 
 /* Hide the leaflet image overlay's default border weirdness */
-.leaflet-container { background: #fff; outline: none; }
+.leaflet-container {
+  background: #fff;
+  outline: none;
+}
 
+/* marker */
+.marker-base-wrapper {
+  background: transparent !important;
+  border: none !important;
+}
+.marker-base-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(var(--marker-scale, 1));
+  transform-origin: center center;
+  transition:
+    transform 0.15s,
+    background 0.15s,
+    color 0.15s;
+}
+
+.marker-base-circle:has(.marker-services) {
+  border-color: #fff;
+  background: var(--color-primary);
+}
+
+.marker-avatar {
+  width: 20px;
+  height: 20px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.marker-culinary {
+  background-image: url("./assets/culinary.svg");
+}
+
+.marker-sponsors {
+  background-image: url("./assets/sponsors.svg");
+}
+
+.marker-automatives {
+  background-image: url("./assets/automatives.svg");
+}
+
+.marker-services {
+  background-image: url("./assets/services.svg");
+}
+/* Special icon overrides — applied via marker-${a.icon} when icon is a named asset */
+.marker-shop {
+  background-image: url('./assets/shop.svg');
+}
+.marker-stage {
+  background-image: url('./assets/stage.svg');
+}
+.marker-guest {
+  background-image: url('./assets/guest.svg');
+}
+.marker-lounge {
+  background-image: url('./assets/lounge.svg');
+}
+.marker-toilet {
+  background-image: url('./assets/toilet.svg');
+}
+.marker-shuttle {
+  background-image: url('./assets/shuttle.svg');
+}
+.marker-firstAid {
+  background-image: url('./assets/firstAid.svg');
+}
 /* PIN */
-.pin-icon-wrapper { background: transparent !important; border: none !important; }
+/* .pin-icon-wrapper {
+  background: transparent !important;
+  border: none !important;
+}
 .pin-circle {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: #867050; border: 3px solid #fff; color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 0.85rem;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
-  transition: transform 0.15s, background 0.15s, color 0.15s;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #867050;
+  border: 3px solid #fff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  transition:
+    transform 0.15s,
+    background 0.15s,
+    color 0.15s;
 }
 .pin-icon-wrapper:hover .pin-circle {
-  background: #fff; color: #867050; transform: scale(1.2);
-}
+  background: #fff;
+  color: #867050;
+  transform: scale(1.2);
+} */
 
 /* CLUSTER */
-.cluster-icon-wrapper { background: transparent !important; border: none !important; }
+.cluster-icon-wrapper {
+  background: transparent !important;
+  border: none !important;
+}
 .cluster-circle {
-  width: 52px; height: 52px; border-radius: 50%;
-  background: #867050; border: 3px solid #fff; color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 1rem;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.55);
-  transition: transform 0.15s, background 0.15s;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #867050;
+  border: 3px solid #fff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+  transition:
+    transform 0.15s,
+    background 0.15s;
 }
 .cluster-icon-wrapper:hover .cluster-circle {
-  background: #5a4a35; transform: scale(1.12);
+  background: #5a4a35;
+  transform: scale(1.12);
 }
 
 /* POPUP */
 .leaflet-popup-content-wrapper {
-  border: 2.5px solid #867050; border-radius: 14px; padding: 0;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+  border: 2.5px solid #867050;
+  border-radius: 14px;
+  padding: 0;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
 }
-.leaflet-popup-content { margin: 10px; }
-.leaflet-popup-tip { background: #fff; border: 2.5px solid #867050; }
+.leaflet-popup-content {
+  margin: 10px;
+}
+.leaflet-popup-tip {
+  background: #fff;
+  border: 2.5px solid #867050;
+}
 
-.pop { display: flex; gap: 14px; align-items: center; }
-.pop-thumb { width: 90px; height: 72px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
-.pop-cat { font-size: 0.7rem; color: #867050; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
-.pop-title { font-size: 1rem; font-weight: 700; color: #222; line-height: 1.35; margin-top: 2px; }
+.pop {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.pop-thumb {
+  width: 90px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.pop-cat {
+  font-size: 0.7rem;
+  color: #867050;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+.pop-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #222;
+  line-height: 1.35;
+  margin-top: 2px;
+}
 
 /* Hint */
-.hint {
-  position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-  background: rgba(0,0,0,0.55); color: #ccc;
-  padding: 6px 14px; border-radius: 20px; font-size: 0.75rem;
-  pointer-events: none; z-index: 1000; transition: opacity 1s;
+/* .hint {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  color: #ccc;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  pointer-events: none;
+  z-index: 1000;
+  transition: opacity 1s;
 }
-.hint.hidden { opacity: 0; }
+.hint.hidden {
+  opacity: 0;
+} */
 
 /* SEO-crawlable attraction list — visually hidden but in the DOM for crawlers
    and screen readers. Use position absolute with 1px clip rather than display:none
    so search engines still see it. */
 .sr-list {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Leaflet zoom button restyle to match the original look */
-.leaflet-bar a, .leaflet-bar a:hover {
-  background: #fff; color: #867050; border: 2px solid #867050;
-  width: 40px; height: 40px; line-height: 36px; font-weight: 700; font-size: 1.3rem;
-  border-radius: 8px !important; margin-bottom: 6px;
+.leaflet-bar a,
+.leaflet-bar a:hover {
+  background: #fff;
+  color: #867050;
+  border: 2px solid #867050;
+  width: 40px;
+  height: 40px;
+  line-height: 36px;
+  font-weight: 700;
+  font-size: 1.3rem;
+  border-radius: 8px !important;
+  margin-bottom: 6px;
 }
-.leaflet-bar a:hover { background: #867050; color: #fff; }
-.leaflet-bar { border: none !important; box-shadow: none !important; background: transparent; }
+.leaflet-bar a:hover {
+  background: #867050;
+  color: #fff;
+}
+.leaflet-bar {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent;
+}
+.leaflet-bottom.leaflet-right {
+  display: none;
+}
+
+/* ─── SELECTED PIN ──────────────────────────────────────────────────────── */
+.selected-pin-wrapper {
+  background: transparent !important;
+  border: none !important;
+  /* scale from the tip (20px 43px) so it stays anchored to the marker */
+  transform: scale(var(--marker-scale, 1));
+  transform-origin: 20px 43px;
+  transition: transform 0.15s;
+}
+
+/* ─── FILTER BAR ────────────────────────────────────────────────────────── */
+.filter-bar {
+  position: fixed;
+  top: 12px;
+  left: 0;
+  right: 0;
+  z-index: 400;
+  display: flex;
+  gap: 8px;
+  padding: 4px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.filter-bar::-webkit-scrollbar {
+  display: none;
+}
+.filter-chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+  background: #fff;
+  color: #4a4a4a;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  border: 0;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.chip-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.filter-chip.active {
+  border: 1px solid #163029;
+  background: linear-gradient(180deg, #f0f0f0 29.17%, #fff 100%);
+}
+/* .filter-chip:hover:not(.active) {
+  border: 1px solid #163029;
+  font-weight: 700;
+} */
+
+/* ─── SLIDE-UP DRAWER ───────────────────────────────────────────────────── */
+.drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.18);
+  z-index: 500;
+  padding: 0 20px 28px;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.drawer.open {
+  transform: translateY(0);
+}
+.drawer-handle-bar {
+  width: 36px;
+  height: 4px;
+  background: #ddd;
+  border-radius: 2px;
+  margin: 12px auto 18px;
+}
+.drawer-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: #f0ece6;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.drawer-close:hover {
+  background: #e0d8cc;
+}
+.drawer-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.drawer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.drawer-cat {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #867050;
+  background: #f5f0e8;
+  padding: 3px 9px;
+  border-radius: 10px;
+  align-self: flex-start;
+}
+.drawer-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #222;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

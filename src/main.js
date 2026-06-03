@@ -1,16 +1,22 @@
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.markercluster';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
-import mapImageUrl from '../dummy_map.jpg';
-import { attractions, MAP_W, MAP_H } from './attractions.js';
-import './style.css';
+import mapImageUrl from "../map.png";
+import selectedPinUrl from "./assets/selected.svg";
+// import iconServices    from './assets/services.svg';
+import iconCulinary from "./assets/culinary.svg";
+import iconAutomatives from "./assets/automatives.svg";
+import iconSponsors from "./assets/sponsors.svg";
+import iconOthers from "./assets/others.svg";
+import { attractions, MAP_W, MAP_H, CATEGORY_META } from "./attractions.js";
+import "./style.css";
 
 // ─── MAP SETUP (CRS.Simple = treat image as flat coordinate space) ──────────
 // In CRS.Simple, latLng = [y, x] in image pixels.
-const map = L.map('map', {
+const map = L.map("map", {
   crs: L.CRS.Simple,
   minZoom: -2,
   maxZoom: 2,
@@ -22,85 +28,217 @@ const map = L.map('map', {
   wheelPxPerZoomLevel: 120,
 });
 
-const bounds = [[0, 0], [MAP_H, MAP_W]];
+const bounds = [
+  [0, 0],
+  [MAP_H, MAP_W],
+];
 L.imageOverlay(mapImageUrl, bounds).addTo(map);
-map.setMaxBounds([[-100, -100], [MAP_H + 100, MAP_W + 100]]);
-map.fitBounds(bounds);
+map.setMaxBounds([
+  [-100, -100],
+  [MAP_H + 100, MAP_W + 100],
+]);
 
-L.control.zoom({ position: 'bottomright' }).addTo(map);
+// Init zoom so the map image fills the full viewport height (100svh)
+const initZoom = Math.log2(map.getContainer().clientHeight / MAP_H);
+map.setView([MAP_H / 2, MAP_W / 2], initZoom);
 
-// ─── PIN ICON FACTORY ───────────────────────────────────────────────────────
-function makePinIcon(a) {
+L.control.zoom({ position: "bottomright" }).addTo(map);
+
+// ─── MARKER SCALE ON ZOOM ───────────────────────────────────────────────────
+function updateMarkerScale() {
+  const zoom = map.getZoom();
+  // zoom 0 → scale 1.0, zoom -1 → 0.5, zoom -2 → 0.4 (clamped), zoom 1 → 1.5 (clamped)
+  const scale = Math.min(1.5, Math.max(0.4, Math.pow(2, zoom)));
+  document.documentElement.style.setProperty("--marker-scale", scale);
+}
+map.on("zoom", updateMarkerScale);
+updateMarkerScale();
+
+// ─── map marker ─────────────────────────
+
+const SPECIAL_ICONS = new Set([
+  "shop",
+  "stage",
+  "guest",
+  "lounge",
+  "toilet",
+  "shuttle",
+  "firstAid",
+]);
+
+function iconClass(a) {
+  return SPECIAL_ICONS.has(a.icon) ? ` marker-${a.icon}` : "";
+}
+
+function markerBase(a) {
   return L.divIcon({
-    className: 'pin-icon-wrapper',
-    html: `<div class="pin-circle" style="background:${a.color}">${a.id}</div>`,
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
+    className: "marker-base-wrapper",
+    html: `<div class="marker-base-circle">
+      <div class="marker-avatar marker-${a.avatar}${iconClass(a)}"></div>
+    </div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
   });
 }
 
-function thumbDataUri(a) {
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='90' height='72'>
-    <defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'>
-      <stop offset='0%' style='stop-color:${a.thumbBg}'/>
-      <stop offset='100%' style='stop-color:${a.color}'/>
-    </linearGradient></defs>
-    <rect width='90' height='72' fill='url(#g)' rx='8'/>
-    <text x='45' y='44' text-anchor='middle' font-size='32'
-      font-family='Segoe UI Emoji,Apple Color Emoji,sans-serif'>${a.icon}</text>
-  </svg>`;
-  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+// ─── SELECTED PIN + DRAWER ──────────────────────────────────────────────────
+const attractionById = new Map(attractions.map((a) => [a.id, a]));
+let selectedPinMarker = null;
+let selectedAttrId = null;
+
+function makeSelectedPinIcon() {
+  return L.divIcon({
+    className: "selected-pin-wrapper",
+    html: `<img src="${selectedPinUrl}" width="40" height="51" alt="" />`,
+    iconSize: [40, 51],
+    // tip of the teardrop is at y≈43 in the SVG → aligns with the marker's coordinate
+    iconAnchor: [14, 43],
+  });
 }
 
-function popupHtml(a) {
-  return `<div class="pop">
-    <img class="pop-thumb" src="${thumbDataUri(a)}" alt="${a.name}" />
-    <div class="pop-body">
-      <div class="pop-cat">${a.category}</div>
-      <div class="pop-title">${a.name}</div>
-    </div>
-  </div>`;
+function clearSelectedPin() {
+  if (selectedPinMarker) {
+    map.removeLayer(selectedPinMarker);
+    selectedPinMarker = null;
+  }
+  selectedAttrId = null;
 }
 
-// ─── CLUSTER LAYER ──────────────────────────────────────────────────────────
-const cluster = L.markerClusterGroup({
-  maxClusterRadius: 60,
-  showCoverageOnHover: false,
-  spiderfyOnMaxZoom: true,
-  iconCreateFunction: (c) => L.divIcon({
-    className: 'cluster-icon-wrapper',
-    html: `<div class="cluster-circle">${c.getChildCount()}</div>`,
-    iconSize: [52, 52],
-    iconAnchor: [26, 26],
-  }),
-});
+function openDrawer(a) {
+  document.getElementById("drawerCat").textContent = a.category;
+  document.getElementById("drawerName").textContent = a.name;
+  document.getElementById("drawer").classList.add("open");
+}
 
+function closeDrawer() {
+  document.getElementById("drawer").classList.remove("open");
+  clearSelectedPin();
+}
+
+function selectAttraction(a) {
+  clearSelectedPin();
+  selectedAttrId = a.id;
+  selectedPinMarker = L.marker([a.y, a.x], {
+    icon: makeSelectedPinIcon(),
+    zIndexOffset: 1000,
+    interactive: false,
+  }).addTo(map);
+  openDrawer(a);
+}
+
+document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+
+// ─── MARKERS ────────────────────────────────────────────────────────────────
 const markerById = new Map();
+let ignoreMapClick = false;
 
 for (const a of attractions) {
   // CRS.Simple: latLng = [y, x]
   const marker = L.marker([a.y, a.x], {
-    icon: makePinIcon(a),
+    icon: markerBase(a),
     title: a.name,
     alt: a.name,
     riseOnHover: true,
-  }).bindPopup(popupHtml(a), { offset: [0, -10], maxWidth: 320 });
+  });
+  marker.on("click", () => {
+    ignoreMapClick = true;
+    selectAttraction(a);
+    setTimeout(() => {
+      ignoreMapClick = false;
+    }, 0);
+  });
   markerById.set(a.id, marker);
-  cluster.addLayer(marker);
+  map.addLayer(marker);
 }
-map.addLayer(cluster);
+
+map.on("click", () => {
+  if (!ignoreMapClick) closeDrawer();
+});
+
+// ─── FILTER BAR ─────────────────────────────────────────────────────────────
+const CATEGORY_ICON_URL = {
+  services:    iconOthers,
+  culinary:    iconCulinary,
+  automatives: iconAutomatives,
+  sponsors:    iconSponsors,
+};
+
+// Derive locale from first URL path segment: /{locale}/...
+const _locale = window.location.pathname.split('/')[1];
+const _labelKey = (_locale === 'zh-TW' || _locale === 'tc') ? 'label_tc'
+                : (_locale === 'zh-CN' || _locale === 'sc') ? 'label_sc'
+                : 'label';
+function categoryLabel(cat) {
+  return CATEGORY_META[cat]?.[_labelKey] ?? cat;
+}
+
+const categories = [...new Set(attractions.map((a) => a.category))].sort(
+  // sort order: automatives, sponsors, culinary, services
+  (a, b) => {
+    const order = ["automatives", "sponsors", "culinary", "services"];
+    return order.indexOf(a) - order.indexOf(b);
+  }
+);
+
+let activeFilter = null;
+const filterBar = document.getElementById("filterBar");
+
+categories.forEach((cat) => {
+  const chip = document.createElement("button");
+  chip.className = "filter-chip";
+  chip.dataset.category = cat;
+  const iconUrl = CATEGORY_ICON_URL[cat];
+  const label = categoryLabel(cat);
+  chip.innerHTML = iconUrl
+    ? `<img src="${iconUrl}" class="chip-icon" alt="" aria-hidden="true" />${label}`
+    : label;
+  filterBar.appendChild(chip);
+});
+
+filterBar.addEventListener("click", (e) => {
+  const chip = e.target.closest(".filter-chip");
+  if (!chip) return;
+
+  // Toggle off if already active → show all
+  if (chip.classList.contains("active")) {
+    chip.classList.remove("active");
+    activeFilter = null;
+  } else {
+    filterBar
+      .querySelectorAll(".filter-chip")
+      .forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+    activeFilter = chip.dataset.category;
+  }
+
+  for (const [id, marker] of markerById) {
+    const a = attractionById.get(id);
+    if (activeFilter === null || a.category === activeFilter) {
+      if (!map.hasLayer(marker)) map.addLayer(marker);
+    } else {
+      if (map.hasLayer(marker)) map.removeLayer(marker);
+    }
+  }
+
+  // Close drawer if the selected attraction is now filtered out
+  if (selectedAttrId !== null) {
+    const sel = attractionById.get(selectedAttrId);
+    if (activeFilter !== null && sel.category !== activeFilter) closeDrawer();
+  }
+});
 
 // ─── CRAWLABLE LIST → click to zoom/open ────────────────────────────────────
-document.querySelectorAll('[data-attraction-id]').forEach((el) => {
-  el.addEventListener('click', (e) => {
+document.querySelectorAll("[data-attraction-id]").forEach((el) => {
+  el.addEventListener("click", (e) => {
     e.preventDefault();
     const id = Number(el.dataset.attractionId);
+    const a = attractionById.get(id);
     const m = markerById.get(id);
-    if (!m) return;
+    if (!m || !a) return;
     map.flyTo(m.getLatLng(), 1, { duration: 0.6 });
-    cluster.zoomToShowLayer(m, () => m.openPopup());
+    selectAttraction(a);
   });
 });
 
-// Hide intro hint after a few seconds
-setTimeout(() => document.getElementById('hint')?.classList.add('hidden'), 4000);
+// // Hide intro hint after a few seconds
+// setTimeout(() => document.getElementById('hint')?.classList.add('hidden'), 4000);

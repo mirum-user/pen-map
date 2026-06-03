@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
+import { copyFileSync, mkdirSync } from 'node:fs';
 import { attractions } from './src/attractions.js';
+
+const LOCALES = ['en', 'zh-TW', 'zh-CN'];
 
 // Inject a crawlable HTML list of attractions into index.html at build/dev time.
 // This is the SEO-friendly source of truth: search engines see real markup,
@@ -40,14 +43,38 @@ function attractionsListPlugin() {
 }
 
 export default defineConfig({
-  plugins: [attractionsListPlugin()],
-  server: { open: '/leaflet.html' },
+  plugins: [attractionsListPlugin(), localeRoutingPlugin()],
+  server: { open: '/en' },
   build: {
     rollupOptions: {
       input: {
-        legacy: resolve(__dirname, 'index.html'),
-        leaflet: resolve(__dirname, 'leaflet.html'),
+        main: resolve(__dirname, 'index.html'),
       },
     },
   },
 });
+
+function localeRoutingPlugin() {
+  return {
+    name: 'locale-routing',
+
+    // Dev: rewrite /{locale}/... → /
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const seg = req.url?.split('/')[1]?.split(/[?#]/)[0];
+        if (LOCALES.includes(seg)) {
+          req.url = '/' + req.url.slice(1 + seg.length);
+        }
+        next();
+      });
+    },
+
+    // Build: copy dist/index.html → dist/{locale}/index.html
+    closeBundle() {
+      for (const locale of LOCALES) {
+        mkdirSync(`dist/${locale}`, { recursive: true });
+        copyFileSync('dist/index.html', `dist/${locale}/index.html`);
+      }
+    },
+  };
+} 
