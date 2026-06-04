@@ -109,8 +109,33 @@ function clearSelectedPin() {
 }
 
 function openDrawer(a) {
-  document.getElementById("drawerCat").textContent = a.category;
+  // Thumb image
+  const thumb = document.getElementById("drawerThumb");
+  if (a.img) {
+    thumb.src = a.img;
+    thumb.alt = a.name;
+    thumb.hidden = false;
+  } else {
+    thumb.hidden = true;
+  }
+
+  // Category label (i18n)
+  document.getElementById("drawerCat").textContent = categoryLabel(a.category);
+
+  // Name
   document.getElementById("drawerName").textContent = a.name;
+
+  // Location row
+  const locRow = document.getElementById("drawerLocation");
+  if (a.locationName || a.locationHref) {
+    document.getElementById("drawerLocationName").textContent = a.locationName ?? "";
+    const cta = document.getElementById("drawerLocationCta");
+    cta.href = a.locationHref ?? "#";
+    locRow.hidden = false;
+  } else {
+    locRow.hidden = true;
+  }
+
   document.getElementById("drawer").classList.add("open");
 }
 
@@ -175,6 +200,7 @@ const _labelKey = (_locale === 'zh-TW' || _locale === 'tc') ? 'label_tc'
 function categoryLabel(cat) {
   return CATEGORY_META[cat]?.[_labelKey] ?? cat;
 }
+
 
 const categories = [...new Set(attractions.map((a) => a.category))].sort(
   // sort order: automatives, sponsors, culinary, services
