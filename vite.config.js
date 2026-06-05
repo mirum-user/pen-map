@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
-import { copyFileSync, mkdirSync } from 'node:fs';
-import { attractions } from './src/attractions.js';
+import { copyFileSync, mkdirSync, readFileSync } from 'node:fs';
+const { attractions } = JSON.parse(readFileSync(new URL('./public/attractions.json', import.meta.url), 'utf-8'));
 
 const LOCALES = ['en', 'zh-TW', 'zh-CN'];
 
@@ -43,7 +43,7 @@ function attractionsListPlugin() {
 }
 
 export default defineConfig({
-  plugins: [attractionsListPlugin(), localeRoutingPlugin()],
+  plugins: [localeRoutingPlugin()],
   server: { open: '/en' },
   build: {
     rollupOptions: {

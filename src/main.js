@@ -11,8 +11,11 @@ import iconCulinary from "./assets/culinary.svg";
 import iconAutomatives from "./assets/automatives.svg";
 import iconSponsors from "./assets/sponsors.svg";
 import iconOthers from "./assets/others.svg";
-import { attractions, MAP_W, MAP_H, CATEGORY_META } from "./attractions.js";
 import "./style.css";
+
+fetch('/attractions.json')
+  .then(r => r.json())
+  .then(({ MAP_W, MAP_H, CATEGORY_META, attractions }) => {
 
 // ─── MAP SETUP (CRS.Simple = treat image as flat coordinate space) ──────────
 // In CRS.Simple, latLng = [y, x] in image pixels.
@@ -56,7 +59,7 @@ function updateMarkerScale() {
   document.documentElement.style.setProperty("--marker-scale", scale);
 }
 map.on("zoom", updateMarkerScale);
-updateMarkerScale();
+// updateMarkerScale();
 
 // ─── map marker ─────────────────────────
 
@@ -93,10 +96,10 @@ let selectedAttrId = null;
 function makeSelectedPinIcon() {
   return L.divIcon({
     className: "selected-pin-wrapper",
-    html: `<img src="${selectedPinUrl}" width="40" height="51" alt="" />`,
-    iconSize: [40, 51],
+    html: `<img src="${selectedPinUrl}" width="30" height="40" alt="" />`,
+    iconSize: [30, 40],
     // tip of the teardrop is at y≈43 in the SVG → aligns with the marker's coordinate
-    iconAnchor: [14, 43],
+    iconAnchor: [15, 40],
   });
 }
 
@@ -172,6 +175,7 @@ for (const a of attractions) {
   marker.on("click", () => {
     ignoreMapClick = true;
     selectAttraction(a);
+    map.panTo([a.y, a.x]);
     setTimeout(() => {
       ignoreMapClick = false;
     }, 0);
@@ -256,6 +260,7 @@ filterBar.addEventListener("click", (e) => {
     if (activeFilter !== null && sel.category !== activeFilter) closeDrawer();
   }
 });
+}); // end fetch
 
 // ─── CRAWLABLE LIST → click to zoom/open ────────────────────────────────────
 document.querySelectorAll("[data-attraction-id]").forEach((el) => {
