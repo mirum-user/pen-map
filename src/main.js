@@ -21,7 +21,7 @@ fetch('/attractions.json')
 // In CRS.Simple, latLng = [y, x] in image pixels.
 const map = L.map("map", {
   crs: L.CRS.Simple,
-  minZoom: 0.1,
+  minZoom: .9,
   maxZoom: 2,
   zoomSnap: 0.4,
   zoomDelta: 0.5,
@@ -37,15 +37,15 @@ const bounds = [
 ];
 L.imageOverlay(mapImageUrl, bounds).addTo(map);
 map.setMaxBounds([
-  [-100, -100],
-  [MAP_H + 100, MAP_W + 100],
+  [0, 0],
+  [MAP_H, MAP_W],
 ]);
 
 // ≥1280px: fit map image width to viewport width; otherwise fit height to 100svh
-const _cw = map.getContainer().clientWidth;
+const _cw = map.getContainer().clientWidth + 120;
 const _ch = map.getContainer().clientHeight;
 const initZoom = _cw >= 1280
-  ? Math.log2(_cw / MAP_W)
+  ? Math.max(Math.log2(_cw / MAP_W), Math.log2(_ch / MAP_H))
   : Math.log2(_ch / MAP_H);
 map.setView([MAP_H / 2, MAP_W / 2], initZoom);
 

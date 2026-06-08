@@ -19,7 +19,7 @@ body {
   height: 100svh;
   background: #ffffff;
   /* offset for safe area */
-  margin-top: -24px;
+  /* margin-top: -24px; */
 }
 
 /* Hide the leaflet image overlay's default border weirdness */
