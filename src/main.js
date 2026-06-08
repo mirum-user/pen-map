@@ -132,8 +132,8 @@ function openDrawer(a) {
   const locRow = document.getElementById("drawerLocation");
   if (a.locationName || a.locationHref) {
     document.getElementById("drawerLocationName").textContent = a.locationName ?? "";
-    const cta = document.getElementById("drawerLocationCta");
-    cta.href = a.locationHref ?? "#";
+    // const cta = document.getElementById("drawerLocationCta");
+    // cta.href = a.locationHref ?? "#";
     locRow.hidden = false;
   } else {
     locRow.hidden = true;
