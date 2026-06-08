@@ -260,6 +260,22 @@ filterBar.addEventListener("click", (e) => {
     if (activeFilter !== null && sel.category !== activeFilter) closeDrawer();
   }
 });
+
+// ─── DEEP-LINK via URL hash ──────────────────────────────────────────────────
+function openAttractionByHash(hash) {
+  if (!hash) return;
+  const name = decodeURIComponent(hash.replace(/^#/, "")).trim();
+  if (!name) return;
+  const nameLower = name.toLowerCase();
+  const a = attractions.find((x) => x.name.toLowerCase() === nameLower);
+  if (!a) return;
+  map.setView([a.y, a.x], Math.max(map.getZoom(), 1), { animate: false });
+  selectAttraction(a);
+}
+
+openAttractionByHash(window.location.hash);
+window.addEventListener("hashchange", () => openAttractionByHash(window.location.hash));
+
 }); // end fetch
 
 // ─── CRAWLABLE LIST → click to zoom/open ────────────────────────────────────
