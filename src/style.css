@@ -283,6 +283,9 @@ body {
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
+.filter-bar.preview {
+  top: 50px;
+}
 .filter-bar::-webkit-scrollbar {
   display: none;
 }

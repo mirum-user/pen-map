@@ -21,7 +21,7 @@ fetch('/attractions.json')
 // In CRS.Simple, latLng = [y, x] in image pixels.
 const map = L.map("map", {
   crs: L.CRS.Simple,
-  minZoom: .9,
+  minZoom: window.innerWidth <= 767 ? 0.001 : 0.09,
   maxZoom: 2,
   zoomSnap: 0.4,
   zoomDelta: 0.5,
@@ -46,7 +46,7 @@ const _cw = map.getContainer().clientWidth + 120;
 const _ch = map.getContainer().clientHeight;
 const initZoom = _cw >= 1280
   ? Math.max(Math.log2(_cw / MAP_W), Math.log2(_ch / MAP_H))
-  : Math.log2(_ch / MAP_H);
+  : .01;
 map.setView([MAP_H / 2, MAP_W / 2], initZoom);
 
 L.control.zoom({ position: "bottomright" }).addTo(map);
@@ -216,6 +216,14 @@ const categories = [...new Set(attractions.map((a) => a.category))].sort(
 
 let activeFilter = null;
 const filterBar = document.getElementById("filterBar");
+
+if (filterBar) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const preview = urlParams.get('preview');
+  if(preview) {
+    filterBar.classList.add('preview');
+  }
+}
 
 categories.forEach((cat) => {
   const chip = document.createElement("button");
