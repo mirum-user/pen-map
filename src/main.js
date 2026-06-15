@@ -5,12 +5,17 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
 import mapImageUrl from "../map.png";
-import selectedPinUrl from "./assets/selected.svg";
+import selectedAutomativesUrl from "./assets/selected-automatives.svg";
+import selectedCulinaryUrl from "./assets/selected-culinary.svg";
+import selectedSponsorsUrl from "./assets/selected-sponsors.svg";
+import selectedServicesUrl from "./assets/selected-services.svg";
+import selectedFirstAidUrl from "./assets/selected-firstAid.svg";
 // import iconServices    from './assets/services.svg';
 import iconCulinary from "./assets/culinary.svg";
 import iconAutomatives from "./assets/automatives.svg";
 import iconSponsors from "./assets/sponsors.svg";
 import iconOthers from "./assets/others.svg";
+import iconFirstAid from "./assets/firstAid.svg";
 import "./style.css";
 
 fetch('/attractions.json')
@@ -81,7 +86,7 @@ function markerBase(a) {
   return L.divIcon({
     className: "marker-base-wrapper",
     html: `<div class="marker-base-circle">
-      <div class="marker-avatar marker-${a.avatar}${iconClass(a)}"></div>
+      <div class="marker-avatar marker-${a.category}">${a.symbol}</div>
     </div>`,
     iconSize: [24, 24],
     iconAnchor: [12, 12],
@@ -93,10 +98,10 @@ const attractionById = new Map(attractions.map((a) => [a.id, a]));
 let selectedPinMarker = null;
 let selectedAttrId = null;
 
-function makeSelectedPinIcon() {
+function makeSelectedPinIcon(a) {
   return L.divIcon({
     className: "selected-pin-wrapper",
-    html: `<img src="${selectedPinUrl}" width="30" height="40" alt="" />`,
+    html: `<img src="${SELECTED_PIN_MAP[a.category]}" width="30" height="40" alt="" />`,
     iconSize: [30, 40],
     // tip of the teardrop is at y≈43 in the SVG → aligns with the marker's coordinate
     iconAnchor: [15, 40],
@@ -112,38 +117,64 @@ function clearSelectedPin() {
 }
 
 function openDrawer(a) {
-  // Thumb image
-  const thumb = document.getElementById("drawerThumb");
-  if (a.img) {
-    thumb.src = a.img;
-    thumb.alt = a.name;
-    thumb.hidden = false;
-  } else {
-    thumb.hidden = true;
-  }
+  const content = document.getElementById("drawerContent");
+  content.innerHTML = '';
+  a.booths.forEach(booth => {
+    const card = document.createElement('div');
+    card.className = 'drawer-booth';
 
-  // Category label (i18n)
-  document.getElementById("drawerCat").textContent = categoryLabel(a.category);
+    if (booth.img) {
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.className = 'drawer-thumb';
+      img.src = booth.img;
+      img.alt = booth.name;
+      card.appendChild(img);
+    }
 
-  // Name
-  document.getElementById("drawerName").textContent = a.name;
+    const drawerSubCat = document.createElement('span');
+    drawerSubCat.className = 'drawer-cat';
+    drawerSubCat.id = 'drawerCat';
+    drawerSubCat.textContent = a.subCategory;
 
-  // Location row
-  const locRow = document.getElementById("drawerLocation");
-  if (a.locationName || a.locationHref) {
-    document.getElementById("drawerLocationName").textContent = a.locationName ?? "";
-    // const cta = document.getElementById("drawerLocationCta");
-    // cta.href = a.locationHref ?? "#";
-    locRow.hidden = false;
-  } else {
-    locRow.hidden = true;
-  }
+    const info = document.createElement('div');
+    info.className = 'drawer-info';
 
-  document.getElementById("drawer").classList.add("open");
+    info.appendChild(drawerSubCat);
+
+    const name = document.createElement('div');
+    name.className = 'drawer-name';
+    name.textContent = booth.name;
+    info.appendChild(name);
+
+    if (booth.locationName) {
+      const loc = document.createElement('div');
+      loc.className = 'drawer-location';
+      const nameFrame = document.createElement('div');
+      nameFrame.className = 'drawer-location-nameFrame';
+      const locName = document.createElement('span');
+      locName.className = 'drawer-location-name';
+      locName.textContent = booth.locationName ?? '';
+      nameFrame.appendChild(locName);
+      loc.appendChild(nameFrame);
+      info.appendChild(loc);
+    }
+
+    card.appendChild(info);
+    content.appendChild(card);
+  });
+
+  const drawer = document.getElementById("drawer");
+  const prevCat = [...drawer.classList].find(c => c.startsWith('cat-'));
+  if (prevCat) drawer.classList.remove(prevCat);
+  drawer.classList.add('open', `cat-${a.category}`);
 }
 
 function closeDrawer() {
-  document.getElementById("drawer").classList.remove("open");
+  const drawer = document.getElementById("drawer");
+  const catClass = [...drawer.classList].find(c => c.startsWith('cat-'));
+  if (catClass) drawer.classList.remove(catClass);
+  drawer.classList.remove("open");
   clearSelectedPin();
 }
 
@@ -151,7 +182,7 @@ function selectAttraction(a) {
   clearSelectedPin();
   selectedAttrId = a.id;
   selectedPinMarker = L.marker([a.y, a.x], {
-    icon: makeSelectedPinIcon(),
+    icon: makeSelectedPinIcon(a),
     zIndexOffset: 1000,
     interactive: false,
   }).addTo(map);
@@ -194,6 +225,15 @@ const CATEGORY_ICON_URL = {
   culinary:    iconCulinary,
   automatives: iconAutomatives,
   sponsors:    iconSponsors,
+  firstAid:    iconFirstAid,
+};
+
+const SELECTED_PIN_MAP = {
+  services:    selectedServicesUrl,
+  culinary:    selectedCulinaryUrl,
+  automatives: selectedAutomativesUrl,
+  sponsors:    selectedSponsorsUrl,
+  firstAid:    selectedFirstAidUrl,
 };
 
 // Derive locale from first URL path segment: /{locale}/...
@@ -209,7 +249,7 @@ function categoryLabel(cat) {
 const categories = [...new Set(attractions.map((a) => a.category))].sort(
   // sort order: automatives, sponsors, culinary, services
   (a, b) => {
-    const order = ["automatives", "sponsors", "culinary", "services"];
+    const order = ["automatives", "sponsors", "culinary", "services", "firstAid"];
     return order.indexOf(a) - order.indexOf(b);
   }
 );
@@ -229,11 +269,8 @@ categories.forEach((cat) => {
   const chip = document.createElement("button");
   chip.className = "filter-chip";
   chip.dataset.category = cat;
-  const iconUrl = CATEGORY_ICON_URL[cat];
   const label = categoryLabel(cat);
-  chip.innerHTML = iconUrl
-    ? `<img src="${iconUrl}" class="chip-icon" alt="" aria-hidden="true" />${label}`
-    : label;
+  chip.innerHTML = `<span class="chip-icon chip-icon-${cat}"></span>${label}`;
   filterBar.appendChild(chip);
 });
 
@@ -275,7 +312,7 @@ function openAttractionByHash(hash) {
   const name = decodeURIComponent(hash.replace(/^#/, "")).trim();
   if (!name) return;
   const nameLower = name.toLowerCase();
-  const a = attractions.find((x) => x.name.toLowerCase() === nameLower);
+  const a = attractions.find((x) => x.booths.some(b => b.name.toLowerCase() === nameLower));
   if (!a) return;
   map.setView([a.y, a.x], Math.max(map.getZoom(), 1), { animate: false });
   selectAttraction(a);

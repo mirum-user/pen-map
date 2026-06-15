@@ -21,12 +21,12 @@ function attractionsListPlugin() {
         ${items.map(a => `
           <li>
             <a href="#pin-${a.id}" data-attraction-id="${a.id}">
-              <strong>${a.name}</strong>
+              <strong>${a.booths[0].name}</strong>
             </a>
             <script type="application/ld+json">${JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Place',
-              name: a.name,
+              name: a.booths[0].name,
               additionalType: cat,
               identifier: a.id,
             })}</script>

@@ -11,7 +11,12 @@ body {
   color: #222;
 
   --color-primary: #c6bfb2;
-  --color-mid-grey: #6D6E71;
+  --color-mid-grey: #6d6e71;
+  --color-light-grey: #cac6c0;
+  --color-automotives: #163029;
+  --color-culinary: #e58201;
+  --color-sponsors: #867050;
+  --color-firstAid: #ac3b3b;
 }
 
 #map {
@@ -56,30 +61,52 @@ body {
 }
 
 .marker-avatar {
-  width: 15px;
-  height: 15px;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%;
+  letter-spacing: -0.55px;
+}
+
+.marker-culinary,
+.marker-sponsors {
+  background-color: #fff;
+  border-color: var(--color-light-grey);
 }
 
 .marker-culinary {
-  background-image: url("./assets/culinary.svg");
+  color: var(--color-culinary);
 }
 
 .marker-sponsors {
-  background-image: url("./assets/sponsors.svg");
+  color: var(--color-sponsors);
 }
 
 .marker-automatives {
-  background-image: url("./assets/automatives.svg");
+  background-color: var(--color-automotives);
+  border-color: #aaa;
+  color: #fff;
 }
 
 .marker-services {
-  background-image: url("./assets/services.svg");
+  background-color: var(--color-primary);
+  border-color: #fff;
+  color: #fff;
 }
 /* Special icon overrides — applied via marker-${a.icon} when icon is a named asset */
-.marker-shop {
+/* .marker-shop {
   background-image: url("./assets/shop.svg");
 }
 .marker-stage {
@@ -96,9 +123,11 @@ body {
 }
 .marker-shuttle {
   background-image: url("./assets/shuttle.svg");
-}
+} */
 .marker-firstAid {
   background-image: url("./assets/firstAid.svg");
+  width: 15px;
+  height: 15px;
 }
 /* PIN */
 /* .pin-icon-wrapper {
@@ -272,7 +301,7 @@ body {
 /* ─── FILTER BAR ────────────────────────────────────────────────────────── */
 .filter-bar {
   position: fixed;
-  top: 12px;
+  top: 50px;
   left: 0;
   right: 0;
   z-index: 400;
@@ -283,9 +312,6 @@ body {
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
-.filter-bar.preview {
-  top: 50px;
-}
 .filter-bar::-webkit-scrollbar {
   display: none;
 }
@@ -293,7 +319,7 @@ body {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   padding: 7px 14px;
   border-radius: 20px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
@@ -312,12 +338,46 @@ body {
 .chip-icon {
   width: 16px;
   height: 16px;
-  object-fit: contain;
   flex-shrink: 0;
+  background-color: currentColor;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+.chip-icon-services {
+  background-image: url("./assets/others.svg");
+  background-color: transparent;
+}
+.chip-icon-culinary {
+  mask-image: url("./assets/culinary.svg");
+  -webkit-mask-image: url("./assets/culinary.svg");
+  background-color: var(--color-culinary);
+}
+.chip-icon-automatives {
+  mask-image: url("./assets/automatives.svg");
+  -webkit-mask-image: url("./assets/automatives.svg");
+  background-color: var(--color-automotives);
+}
+.chip-icon-sponsors {
+  mask-image: url("./assets/sponsors.svg");
+  -webkit-mask-image: url("./assets/sponsors.svg");
+  background-color: var(--color-sponsors);
+}
+.chip-icon-firstAid {
+  mask-image: url("./assets/firstAid.svg");
+  -webkit-mask-image: url("./assets/firstAid.svg");
+  background-color: var(--color-firstAid);
 }
 .filter-chip.active {
-  border: 1px solid #163029;
-  background: linear-gradient(180deg, #f0f0f0 29.17%, #fff 100%);
+  background: var(--color-sponsors);
+  color: #fff;
+
+  .chip-icon-automatives,
+  .chip-icon-culinary,
+  .chip-icon-sponsors,
+  .chip-icon-firstAid {
+    background-color: #fff;
+  }
 }
 /* .filter-chip:hover:not(.active) {
   border: 1px solid #163029;
@@ -341,9 +401,14 @@ body {
 .drawer.open {
   transform: translateY(0);
   border-radius: 12px 12px 0 0;
-  border-top: 2px solid #163029;
-  background: linear-gradient(164deg, #F8F8F8 40.46%, #FBFBFB 88.76%);
+  border-top: 2px solid var(--color-mid-grey);
+  background: linear-gradient(164deg, #f8f8f8 40.46%, #fbfbfb 88.76%);
 }
+.drawer.cat-automatives { border-top-color: var(--color-automotives); }
+.drawer.cat-services { border-top-color: var(--color-primary); }
+.drawer.cat-culinary    { border-top-color: var(--color-culinary); }
+.drawer.cat-sponsors    { border-top-color: var(--color-sponsors); }
+.drawer.cat-firstAid   { border-top-color: var(--color-firstAid); }
 .drawer-handle-bar {
   width: 36px;
   height: 4px;
@@ -369,16 +434,24 @@ body {
   background: transparent;
 }
 
-.drawer-body {
+.drawer-content {
+  display: flex;
+  flex-direction: column;
+}
+.drawer-booth {
   display: flex;
   align-items: flex-start;
   gap: 16px;
 }
+.drawer-booth + .drawer-booth {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-light-grey);
+}
 .drawer-thumb {
   flex-shrink: 0;
-  width: 80px;
-  height: 80px;
-  border-radius: 10px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
   background: #f0ece6;
 }
@@ -388,26 +461,29 @@ body {
   gap: 5px;
   min-width: 0;
   flex-grow: 1;
+  min-height: 120px;
 }
 .drawer-cat {
-  display: inline-block;
   font-size: 14px;
   font-weight: 400;
-  color: #867050;
-  align-self: flex-start;
+  color: #4a4a4a;
 }
 .drawer-name {
   font-size: 16px;
   font-weight: 590;
   color: #4a4a4a;
   line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .drawer-location {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  margin-top: 8px;
+  margin-top: auto;
   justify-content: space-between;
 }
 .drawer-location-name {
