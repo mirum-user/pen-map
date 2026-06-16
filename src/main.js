@@ -47,7 +47,7 @@ map.setMaxBounds([
 ]);
 
 // ≥1280px: fit map image width to viewport width; otherwise fit height to 100svh
-const _cw = map.getContainer().clientWidth + 120;
+const _cw = map.getContainer().clientWidth;
 const _ch = map.getContainer().clientHeight;
 const initZoom = _cw >= 1280
   ? Math.max(Math.log2(_cw / MAP_W), Math.log2(_ch / MAP_H))
@@ -168,14 +168,16 @@ function openDrawer(a) {
   const prevCat = [...drawer.classList].find(c => c.startsWith('cat-'));
   if (prevCat) drawer.classList.remove(prevCat);
   drawer.classList.add('open', `cat-${a.category}`);
+  document.getElementById('listViewToggle').classList.add('hidden');
 }
 
 function closeDrawer() {
   const drawer = document.getElementById("drawer");
   const catClass = [...drawer.classList].find(c => c.startsWith('cat-'));
   if (catClass) drawer.classList.remove(catClass);
-  drawer.classList.remove("open");
+  drawer.classList.remove("open", "drawer--list");
   clearSelectedPin();
+  document.getElementById('listViewToggle').classList.remove('hidden');
 }
 
 function selectAttraction(a) {
@@ -320,6 +322,115 @@ function openAttractionByHash(hash) {
 
 openAttractionByHash(window.location.hash);
 window.addEventListener("hashchange", () => openAttractionByHash(window.location.hash));
+
+// ─── LIST VIEW ───────────────────────────────────────────────────────────────
+function openListView() {
+  const content = document.getElementById("drawerContent");
+  content.innerHTML = '';
+
+  const catOrder = ["automatives", "sponsors", "culinary", "services", "firstAid"];
+  const byCategory = {};
+  for (const a of attractions) {
+    if (!byCategory[a.category]) byCategory[a.category] = [];
+    byCategory[a.category].push(a);
+  }
+
+  // Insert sticky header with title + total count
+  const totalCount = attractions.reduce((sum, a) => sum + a.booths.length, 0);
+  const listHeader = document.createElement('div');
+  listHeader.className = 'drawer-list-header';
+  const listTitle = document.createElement('span');
+  listTitle.className = 'drawer-list-header-title';
+  listTitle.textContent = 'All Attractions';
+  const listCount = document.createElement('span');
+  listCount.className = 'drawer-list-header-count';
+  listCount.textContent = totalCount;
+  listHeader.appendChild(listTitle);
+  listHeader.appendChild(listCount);
+  content.appendChild(listHeader);
+
+  const scrollContainer = document.createElement('div');
+  scrollContainer.className = 'drawer-list-scroll';
+
+  catOrder.forEach(cat => {
+    if (!byCategory[cat]) return;
+    const section = document.createElement('div');
+    section.className = 'drawer-list-section';
+
+    byCategory[cat].forEach(a => {
+      a.booths.forEach(booth => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'drawer-booth drawer-list-item';
+
+        if (booth.img) {
+          const img = document.createElement('img');
+          img.loading = 'lazy';
+          img.className = 'drawer-thumb';
+          img.src = booth.img;
+          img.alt = booth.name;
+          card.appendChild(img);
+        }
+
+        const info = document.createElement('div');
+        info.className = 'drawer-info';
+
+        const catSpan = document.createElement('span');
+        catSpan.className = 'drawer-cat';
+        catSpan.textContent = a.subCategory;
+        info.appendChild(catSpan);
+
+        const name = document.createElement('div');
+        name.className = 'drawer-name';
+        name.textContent = booth.name;
+        info.appendChild(name);
+
+        if (booth.locationName) {
+          const loc = document.createElement('div');
+          loc.className = 'drawer-location';
+          const nameFrame = document.createElement('div');
+          nameFrame.className = 'drawer-location-nameFrame';
+          const locName = document.createElement('span');
+          locName.className = 'drawer-location-name';
+          locName.textContent = booth.locationName;
+          nameFrame.appendChild(locName);
+          loc.appendChild(nameFrame);
+          info.appendChild(loc);
+        }
+
+        card.appendChild(info);
+
+        card.addEventListener('click', () => {
+          const drawer = document.getElementById("drawer");
+          drawer.classList.remove('drawer--list');
+          map.panTo([a.y, a.x]);
+          selectAttraction(a);
+        });
+
+        section.appendChild(card);
+      });
+    });
+
+    scrollContainer.appendChild(section);
+  });
+
+  content.appendChild(scrollContainer);
+
+  const drawer = document.getElementById("drawer");
+  const prevCat = [...drawer.classList].find(c => c.startsWith('cat-'));
+  if (prevCat) drawer.classList.remove(prevCat);
+  drawer.classList.add('open', 'drawer--list');
+  document.getElementById('listViewToggle').classList.add('hidden');
+}
+
+document.getElementById("listViewToggle").addEventListener("click", () => {
+  const drawer = document.getElementById("drawer");
+  if (drawer.classList.contains('open') && drawer.classList.contains('drawer--list')) {
+    closeDrawer();
+  } else {
+    openListView();
+  }
+});
 
 }); // end fetch
 
