@@ -1167,6 +1167,11 @@
           "name": "Merchandise Store",
           "img": "https://dummyimage.com/400x400/023e8a/ffffff.png",
           "locationName": "South Entrance"
+        },
+        {
+          "name": "Merchandise Store 2",
+          "img": "https://dummyimage.com/400x400/f23e8a/ffffff.png",
+          "locationName": "South Entrance 2"
         }
       ]
     }

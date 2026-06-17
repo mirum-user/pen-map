@@ -43,7 +43,8 @@ function attractionsListPlugin() {
 }
 
 export default defineConfig({
-  plugins: [localeRoutingPlugin()],
+  // plugins: [localeRoutingPlugin()],
+  plugins: [],
   server: { open: '/en' },
   build: {
     rollupOptions: {
