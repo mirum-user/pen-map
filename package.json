@@ -11,6 +11,7 @@
     "deploy": "./deploy.sh",
     "ship": "./build-zip.sh"
   },
+  "devUrl": "https://thequailmapdev.dclook.com/",
   "keywords": [],
   "author": "",
   "license": "ISC",
