@@ -341,7 +341,7 @@ function openListView() {
   listHeader.className = 'drawer-list-header';
   const listTitle = document.createElement('span');
   listTitle.className = 'drawer-list-header-title';
-  listTitle.textContent = 'All Attractions';
+  listTitle.textContent = 'All Locations';
   const listCount = document.createElement('span');
   listCount.className = 'drawer-list-header-count';
   listCount.textContent = totalCount;

@@ -381,6 +381,23 @@ body {
   .chip-icon-firstAid {
     background-color: #fff;
   }
+
+  .chip-icon-services {
+    background-image: url("./assets/others_hover.svg");
+  }
+}
+
+.filter-chip.active[data-category="automatives"] {
+  background: var(--color-automotives);
+}
+.filter-chip.active[data-category="culinary"] {
+  background: var(--color-culinary);
+}
+.filter-chip.active[data-category="sponsors"] {
+  background: var(--color-sponsors);
+}
+.filter-chip.active[data-category="firstAid"] {
+  background: var(--color-firstAid);
 }
 /* .filter-chip:hover:not(.active) {
   border: 1px solid #163029;
@@ -654,10 +671,18 @@ body {
   color: var(--color-mid-grey);
 }
 
-.drawer-list-category--automatives { color: var(--color-automotives); }
-.drawer-list-category--culinary    { color: var(--color-culinary); }
-.drawer-list-category--sponsors    { color: var(--color-sponsors); }
-.drawer-list-category--firstAid    { color: var(--color-firstAid); }
+.drawer-list-category--automatives {
+  color: var(--color-automotives);
+}
+.drawer-list-category--culinary {
+  color: var(--color-culinary);
+}
+.drawer-list-category--sponsors {
+  color: var(--color-sponsors);
+}
+.drawer-list-category--firstAid {
+  color: var(--color-firstAid);
+}
 
 /* button reset — layout/spacing comes from .drawer-booth */
 .drawer-list-item {
@@ -667,7 +692,6 @@ body {
   border: none;
   font-family: inherit;
   cursor: pointer;
-  border-radius: 6px;
   transition: background 0.12s;
   padding: 8px 4px;
 }
