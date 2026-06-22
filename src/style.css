@@ -17,6 +17,7 @@ body {
   --color-culinary: #e58201;
   --color-sponsors: #867050;
   --color-firstAid: #ac3b3b;
+  --color-services: #9F988E;
 
   --color-light-gold: #ae9364;
 }
@@ -372,7 +373,7 @@ body {
   background-color: var(--color-firstAid);
 }
 .filter-chip.active {
-  background: var(--color-sponsors);
+  background: var(--color-services);
   color: #fff;
 
   .chip-icon-automatives,
