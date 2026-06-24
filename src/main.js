@@ -51,7 +51,7 @@ const _cw = map.getContainer().clientWidth;
 const _ch = map.getContainer().clientHeight;
 const initZoom = _cw >= 1280
   ? Math.max(Math.log2(_cw / MAP_W), Math.log2(_ch / MAP_H))
-  : -1.5;
+  : -.5;
 // const fitZoom = Math.min(Math.log2(_cw / MAP_W), Math.log2(_ch / MAP_H));
 // const initZoom = Math.max(map.getMinZoom(), fitZoom);
 map.setView([MAP_H / 2, MAP_W / 2], initZoom);
