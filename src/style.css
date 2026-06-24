@@ -572,7 +572,7 @@ body {
 .list-view-toggle {
   display: inline-flex;
   position: fixed;
-  bottom: 20px;
+  bottom: 40px;
   right: 12px;
   padding: 10px 14px;
   align-items: center;

@@ -26,9 +26,9 @@ fetch('/attractions.json')
 // In CRS.Simple, latLng = [y, x] in image pixels.
 const map = L.map("map", {
   crs: L.CRS.Simple,
-  minZoom: window.innerWidth <= 767 ? 0.001 : 0.09,
+  minZoom: window.innerWidth <= 767 ? -1 : 0,
   maxZoom: 2,
-  zoomSnap: 0.4,
+  zoomSnap: 0.2,
   zoomDelta: 0.5,
   zoomControl: false,
   attributionControl: false,
@@ -51,7 +51,9 @@ const _cw = map.getContainer().clientWidth;
 const _ch = map.getContainer().clientHeight;
 const initZoom = _cw >= 1280
   ? Math.max(Math.log2(_cw / MAP_W), Math.log2(_ch / MAP_H))
-  : .01;
+  : -.5;
+// const fitZoom = Math.min(Math.log2(_cw / MAP_W), Math.log2(_ch / MAP_H));
+// const initZoom = Math.max(map.getMinZoom(), fitZoom);
 map.setView([MAP_H / 2, MAP_W / 2], initZoom);
 
 L.control.zoom({ position: "bottomright" }).addTo(map);
