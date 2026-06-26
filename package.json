@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "vite --port 3030",
+    "dev": "vite --host 0.0.0.0 --port 3030",
     "build": "vite build",
     "preview": "vite preview",
     "deploy": "./deploy.sh && npm run log:deploy",
     "log:deploy": "printf 'deploy_%s  %s\\n' \"$(git rev-parse --short HEAD)\" \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" >> versions.txt",
+    "update:coords": "node public/update-attractions-coordinates.mjs",
     "ship": "./build-zip.sh"
   },
   "devUrl": "https://thequailmapdev.dclook.com/",

@@ -219,8 +219,23 @@ for (const a of attractions) {
   map.addLayer(marker);
 }
 
-map.on("click", () => {
-  if (!ignoreMapClick) closeDrawer();
+map.on("click", (e) => {
+  if (ignoreMapClick) return;
+
+  closeDrawer();
+
+  const y = e.latlng.lat.toFixed(0);
+  const x = e.latlng.lng.toFixed(0);
+
+  L.tooltip({
+    permanent: true,
+    direction: "top",
+    offset: [0, -8],
+    opacity: 0.95,
+  })
+    .setLatLng(e.latlng)
+    .setContent(`x: ${x}, y: ${y}`)
+    .addTo(map);
 });
 
 // ─── FILTER BAR ─────────────────────────────────────────────────────────────
